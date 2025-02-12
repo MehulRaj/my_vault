@@ -2,6 +2,7 @@ class Constant {
   static const String appName = "My Vault";
   static const String savings = "savings";
   static const String withdraws = "withdraws";
+  static const String component = "component";
   static const String myVault = "MyVault";
   static const String enterSavings = "Enter Savings";
   static const String divideSaving = "Divide saving";
