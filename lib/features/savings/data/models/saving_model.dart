@@ -4,11 +4,11 @@ import '../../domain/entities/savings.dart';
 
 part 'saving_model.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 2)
 class SavingModel {
-  @HiveField(0)
+  @HiveField(1)
   final double? saving;
-  @HiveField(3)
+  @HiveField(2)
   final DateTime date;
 
   SavingModel({

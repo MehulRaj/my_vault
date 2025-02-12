@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:my_vault/features/savings/core/hive/hive_boxes.dart';
 import 'package:my_vault/features/savings/data/models/withdraw_model.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -13,10 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorageHelper.init();
   await Hive.initFlutter((await getApplicationDocumentsDirectory()).path);
-  Hive.registerAdapter(SavingModelAdapter());
-  Hive.registerAdapter(WithdrawModelAdapter());
-  await Hive.openBox<SavingModel>(Constant.savings);
-  await Hive.openBox<WithdrawModel>(Constant.withdraws);
+  await HiveBoxes.init();
   runApp(ProviderScope(child: MyApp()));
 }
 

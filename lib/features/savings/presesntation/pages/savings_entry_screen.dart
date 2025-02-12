@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../core/constants.dart';
-import '../../core/helpers/local_storage_helper.dart';
+import '../../domain/entities/component.dart';
 import '../../domain/entities/savings.dart';
-import '../providers/savings_provider.dart';
+import '../providers/component_provider.dart';
 
 class SavingsEntryScreen extends ConsumerStatefulWidget {
   const SavingsEntryScreen({super.key});
@@ -21,12 +20,13 @@ class SavingsEntryScreenState extends ConsumerState<SavingsEntryScreen> {
 
   @override
   void initState() {
-    initPrefs();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final notifier = ref.watch(transactionNotifierProvider.notifier);
+    var component = ref.watch(transactionStreamProvider).value;
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.enterSavings)),
       body: Padding(
@@ -73,15 +73,37 @@ class SavingsEntryScreenState extends ConsumerState<SavingsEntryScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                double saving = double.tryParse(savingsController.text) ?? 0;
-                final savingItem = Saving(
-                  saving: saving,
-                  date: DateTime.now(),
-                );
-                ref
-                    .read(savingListNotifierProvider.notifier)
-                    .addNewSaving(savingItem);
-                saveDataAndNavigate(saving);
+                try {
+                  print("11111");
+                  double saving = double.tryParse(savingsController.text) ?? 0;
+                  var savingA = (_currentSliderValue * saving) / 100;
+                  var savingB = ((100 - _currentSliderValue) * saving) / 100;
+                  print("22222");
+                  component ??= Component(
+                      totalA: 0.0,
+                      savings: [],
+                      withdraws: [],
+                      components: [],
+                      totalB: 0.0);
+                  print("3333 ${component}");
+                  var updatedData = component!.copyWith(
+                      totalA: component!.totalA + savingA,
+                      totalB: component!.totalB + savingB,
+                      savings: [
+                        ...component!.savings,
+                        Saving(
+                          saving: saving,
+                          date: DateTime.now(),
+                        )
+                      ],
+                      withdraws: component!.withdraws,
+                      components: component!.components);
+                  print("11111");
+                  await notifier.update(updatedData);
+                  Navigator.pop(context);
+                } catch (e) {
+                  print("ERROR ::: ${e.toString()}");
+                }
               },
               child: const Text(Constant.submit),
             ),
@@ -89,24 +111,5 @@ class SavingsEntryScreenState extends ConsumerState<SavingsEntryScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> initPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-    setState(() {});
-  }
-
-  //save values to preferences
-  Future<void> saveDataAndNavigate(saving) async {
-    var newAValue =
-        ((LocalStorageHelper.getDouble(Constant.componentAValue) ?? 0.0) +
-            (_currentSliderValue * saving) / 100);
-    var newBValue =
-        ((LocalStorageHelper.getDouble(Constant.componentBValue) ?? 0.0) +
-            ((100 - _currentSliderValue) * saving) / 100);
-
-    await LocalStorageHelper.setDouble(Constant.componentAValue, newAValue);
-    await LocalStorageHelper.setDouble(Constant.componentBValue, newBValue);
-    Navigator.pop(context, {'newAValue': newAValue, 'newBValue': newBValue});
   }
 }

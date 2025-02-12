@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_vault/features/savings/core/helpers/local_storage_helper.dart';
 import 'package:my_vault/features/savings/domain/entities/withdraw.dart';
-import 'package:my_vault/features/savings/presesntation/providers/withdraw_provider.dart';
 
 import '../../core/constants.dart';
+import '../../domain/entities/component.dart';
+import '../providers/component_provider.dart';
 
 class WithdrawalScreen extends ConsumerStatefulWidget {
   const WithdrawalScreen({super.key});
@@ -19,6 +19,8 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final notifier = ref.watch(transactionNotifierProvider.notifier);
+    final component = ref.watch(transactionStreamProvider).value;
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.withdrawAmount)),
       body: Padding(
@@ -49,17 +51,39 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                double saving = double.tryParse(withdrawalController.text) ?? 0;
-                final withdrawItem = Withdraw(
-                  amount: saving,
-                  component: selectedComponent,
-                  date: DateTime.now(),
-                );
-                ref
-                    .read(withdrawListNotifierProvider.notifier)
-                    .addNewWithdraw(withdrawItem);
-                //user selected compA
-                saveDataAndNavigate(saving);
+                try {
+                  double saving = double.tryParse(withdrawalController.text) ??
+                      0;
+                  Component updatedData = component?.copyWith(
+                    totalA: component.totalA,
+                    totalB: component.totalB,
+                    components: component.components,
+                    savings: component.savings,
+                    withdraws: [
+                      ...component.withdraws,
+                      Withdraw(
+                        amount: saving,
+                        component: selectedComponent,
+                        date: DateTime.now(),
+                      )
+                    ],
+                  );
+
+                  if (selectedComponent == Constant.components[0]) {
+                    updatedData =
+                        updatedData.copyWith(
+                            totalA: component!.totalA - saving);
+                  } else {
+                    updatedData =
+                        updatedData.copyWith(
+                            totalB: component!.totalB - saving);
+                  }
+                  notifier.update(updatedData);
+                }catch(e){
+                  print(e);
+                   SnackBar(content: Text("Error"));
+                }
+                Navigator.pop(context);
               },
               child: const Text(Constant.withdraw),
             ),
@@ -67,29 +91,5 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
         ),
       ),
     );
-  }
-
-  //save values to preferences
-  Future<void> saveDataAndNavigate(saving) async {
-    if (selectedComponent == Constant.components[0]) {
-      await LocalStorageHelper.setDouble(
-          Constant.componentAValue,
-          (LocalStorageHelper.getDouble(Constant.componentAValue) ??
-              0.0) -
-              saving);
-    } else {
-      await LocalStorageHelper.setDouble(
-          Constant.componentBValue,
-          (LocalStorageHelper.getDouble(Constant.componentAValue) ??
-              0.0) -
-              saving);
-    }
-    var data = {
-      'newAValue':
-      LocalStorageHelper.getDouble(Constant.componentAValue),
-      'newBValue':
-      LocalStorageHelper.getDouble(Constant.componentBValue)
-    };
-    Navigator.pop(context, data);
   }
 }

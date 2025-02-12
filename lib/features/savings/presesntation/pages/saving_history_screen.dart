@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_vault/features/savings/domain/entities/savings.dart';
-import 'package:my_vault/features/savings/domain/entities/withdraw.dart';
 
 import '../../core/constants.dart';
-import '../providers/savings_provider.dart';
-import '../providers/withdraw_provider.dart';
+import '../providers/component_provider.dart';
 
 class SavingsHistoryScreen extends ConsumerStatefulWidget {
   const SavingsHistoryScreen({super.key});
@@ -19,19 +16,15 @@ class SavingsHistoryScreenState extends ConsumerState<SavingsHistoryScreen> {
 
   @override
   void initState() {
-    getData();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var history = selectedTabIndex == 0
-        ? ref.watch(savingListNotifierProvider)
-        : ref.watch(withdrawListNotifierProvider);
+    final historyData = ref.watch(transactionStreamProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text(Constant.history)),
-      body: Column(
-        children: [
+        appBar: AppBar(title: const Text(Constant.history)),
+        body: Column(children: [
           Row(
             children: [
               Expanded(
@@ -61,46 +54,73 @@ class SavingsHistoryScreenState extends ConsumerState<SavingsHistoryScreen> {
                             child:
                                 Center(child: Text(Constant.withdrawHistory)),
                           )),
-                    ))
+                    )),
                   ],
                 ),
+              ),
+              historyData.when(
+                data: (data) {
+                  if (data!.components.isEmpty) {
+                    return Expanded(
+                        child:
+                            Center(child: Text(Constant.noHistoryAvailable)));
+                  }
+                  if (data.savings.isNotEmpty && selectedTabIndex == 0) {
+                    return Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16.0),
+                        itemCount: data.savings.length,
+                        itemBuilder: (context, index) {
+                          final entry = data.savings.toList()[index];
+                          return Card(
+                            elevation: 4,
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            child: ListTile(
+                              title: Text(
+                                "Year: ${entry.date.year},Savings: ${entry.saving}",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }
+                  if (data.withdraws.isNotEmpty && selectedTabIndex != 1) {
+                    return Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16.0),
+                        itemCount: data.withdraws.length,
+                        itemBuilder: (context, index) {
+                          final entry = data.withdraws.toList()[index];
+                          return Card(
+                            elevation: 4,
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            child: ListTile(
+                              title: Text(
+                                "Year: ${entry.date.year},Withdraw: ${entry.amount}",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }
+                  return SizedBox();
+                },
+                error: (err, stack) => Center(
+                  child: Text("Error: $err"),
+                ),
+                loading: () => Center(child: CircularProgressIndicator()),
               )
             ],
           ),
-          (history.isEmpty)
-              ? Expanded(
-                  child: Center(child: Text(Constant.noHistoryAvailable)))
-              : Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16.0),
-                    itemCount: history.length,
-                    itemBuilder: (context, index) {
-                      final entry = history.toList()[index];
-                      if (selectedTabIndex == 0) {
-                        entry as Saving;
-                      } else {
-                        entry as Withdraw;
-                      }
-                      return Card(
-                        elevation: 4,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        child: ListTile(
-                          title: Text(
-                            selectedTabIndex == 0
-                                ? "Year: ${(entry as Saving).date.year},Savings: ${(entry).saving}"
-                                : "Year: ${(entry as Withdraw).date.year},Savings: ${entry.amount},Component: ${entry.component}",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                )
-        ],
-      ),
-    );
+        ]));
   }
 
   void onTapSavings() {
@@ -110,14 +130,6 @@ class SavingsHistoryScreenState extends ConsumerState<SavingsHistoryScreen> {
 
   void onTapWithdraw() {
     selectedTabIndex = 1;
-    setState(() {});
-  }
-
-  Future<void> getData() async {
-    Future.microtask(() async {
-      await ref.read(savingListNotifierProvider.notifier).loadSavings();
-      await ref.read(withdrawListNotifierProvider.notifier).loadWithdraws();
-    });
     setState(() {});
   }
 }

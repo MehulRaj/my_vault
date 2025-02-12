@@ -8,7 +8,7 @@ part of 'saving_model.dart';
 
 class SavingModelAdapter extends TypeAdapter<SavingModel> {
   @override
-  final int typeId = 0;
+  final int typeId = 2;
 
   @override
   SavingModel read(BinaryReader reader) {
@@ -17,8 +17,8 @@ class SavingModelAdapter extends TypeAdapter<SavingModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SavingModel(
-      date: fields[3] as DateTime,
-      saving: fields[0] as double?,
+      date: fields[2] as DateTime,
+      saving: fields[1] as double?,
     );
   }
 
@@ -26,9 +26,9 @@ class SavingModelAdapter extends TypeAdapter<SavingModel> {
   void write(BinaryWriter writer, SavingModel obj) {
     writer
       ..writeByte(2)
-      ..writeByte(0)
+      ..writeByte(1)
       ..write(obj.saving)
-      ..writeByte(3)
+      ..writeByte(2)
       ..write(obj.date);
   }
 

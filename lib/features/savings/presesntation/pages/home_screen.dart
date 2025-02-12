@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants.dart';
 import '../../core/helpers/local_storage_helper.dart';
+import '../providers/component_provider.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -17,12 +18,13 @@ class MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   void initState() {
-    initPrefs();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final component = ref.watch(transactionStreamProvider).value;
+    print("component : ${component}");
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.myVault)),
       body: Padding(
@@ -32,19 +34,17 @@ class MainScreenState extends ConsumerState<MainScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildBalanceCard(
-                    Constant.componentA, componentAValue ?? 0.0, Colors.blue),
-                _buildBalanceCard(
-                    Constant.componentB, componentBValue ?? 0.0, Colors.green),
+                _buildBalanceCard(Constant.componentA,
+                    component == null ? 0.0 : component.totalA, Colors.blue),
+                _buildBalanceCard(Constant.componentB,
+                    component == null ? 0.0 : component.totalB, Colors.green),
               ],
             ),
             const SizedBox(height: 20),
             _buildNavigationButton(context, Constant.enterSavings, Icons.add,
                 () async {
-              await Navigator.pushNamed(context, Constant.savingEntryScreenPath)
-                  .then((dynamic data) {
-                updateData(data);
-              });
+              await Navigator.pushNamed(
+                  context, Constant.savingEntryScreenPath);
             }),
             _buildNavigationButton(
                 context, Constant.viewSavingsHistory, Icons.history, () {
@@ -52,11 +52,7 @@ class MainScreenState extends ConsumerState<MainScreen> {
             }),
             _buildNavigationButton(
                 context, Constant.withdrawAmount, Icons.money, () {
-              Navigator.pushNamed(context, Constant.withdrawScreenPath)
-                  .then((dynamic data) {
-                updateData(data);
-              });
-              ;
+              Navigator.pushNamed(context, Constant.withdrawScreenPath);
             }),
           ],
         ),
@@ -106,19 +102,5 @@ class MainScreenState extends ConsumerState<MainScreen> {
         onPressed: onPressed,
       ),
     );
-  }
-
-  Future<void> initPrefs() async {
-    componentAValue = LocalStorageHelper.getDouble(Constant.componentAValue);
-    componentBValue = LocalStorageHelper.getDouble(Constant.componentBValue);
-    setState(() {});
-  }
-
-  void updateData(data) {
-    if (data != null) {
-      componentAValue = data['newAValue'];
-      componentBValue = data['newBValue'];
-      setState(() {});
-    }
   }
 }

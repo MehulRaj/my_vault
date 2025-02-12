@@ -1,24 +1,25 @@
 import 'package:hive_flutter/adapters.dart';
 import 'package:my_vault/features/savings/core/constants.dart';
-import 'package:my_vault/features/savings/data/models/component_model.dart';
-import 'package:my_vault/features/savings/domain/entities/component.dart';
+import 'package:my_vault/features/savings/domain/repositories/component_repository.dart';
 
-class ComponentLocalDatasource {
-  final Box<ComponentModel> tripBox;
+import '../../core/hive/hive_boxes.dart';
+import '../../domain/entities/component.dart';
 
-  ComponentLocalDatasource(this.tripBox);
+class ComponentLocalDatasource implements ComponentRepository {
+  final Box<Component> _box = HiveBoxes.transactionDataBox;
 
-  ComponentModel? getComponent() {
-    var model =
-        ComponentModel(date: DateTime.now(), components: [], saving: 0.0);
-    try {
-      return tripBox.get(Constant.components, defaultValue: model) ?? model;
-    } catch (e) {
-      return model;
-    }
+  @override
+  Stream<Component?> watchTransactionData() {
+    return _box.watch().map((_) => _box.get(Constant.component));
   }
 
-  Future<void> updateComponent(ComponentModel trip) async {
-    tripBox.(trip.components);
+  @override
+  Component? getTransactionData() {
+    return _box.get(Constant.component);
+  }
+
+  @override
+  Future<void> updateTransactionData(Component transaction) async {
+    await _box.put(Constant.component, transaction);
   }
 }
