@@ -1,0 +1,33 @@
+class Constant {
+  static const String appName = "My Vault";
+  static const String savings = "savings";
+  static const String withdraws = "withdraws";
+  static const String myVault = "MyVault";
+  static const String enterSavings = "Enter Savings";
+  static const String divideSaving = "Divide saving";
+  static const String mainScreenPath = '/';
+  static const String savingEntryScreenPath = "/savings_entry";
+  static const String savingHistoryScreenPath = "/savings_history";
+  static const String withdrawScreenPath = "/withdraw_amount";
+  static const String viewSavingsHistory = "View Savings History";
+  static const String withdrawAmount = "Withdraw Amount";
+  static const String enterAnnualSavings = "Enter Annual Savings";
+  static const String submit = "Submit";
+  static const String componentAValue = 'componentAValue';
+  static const String componentBValue = 'componentBValue';
+  static const String vaultHistory = 'vaultHistory';
+  static const String vaultBox = 'vaultBox';
+  static const String savingsHistory = "Savings History";
+  static const String history = "History";
+  static const String withdrawHistory = "Withdraw History";
+  static const String noHistoryAvailable = 'No history available';
+  static const String enterWithdrawAmount = "Enter withdrawal amount";
+  static const String withdraw = "Withdraw";
+  static const String componentA = "Component A";
+  static const String A = "A";
+  static const String B = "B";
+  static const String componentB = "Component B";
+  static const List<String> components = [componentA, componentB];
+  static const splitRatio = "s";
+  static const splitRatios = {componentA: 0.5, componentB: 0.5};
+}
