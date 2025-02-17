@@ -1,6 +1,5 @@
-import 'package:my_vault/features/savings/domain/entities/component.dart';
-
 import '../../domain/repositories/component_repository.dart';
+import '../models/component_model.dart';
 
 class ComponentRepositoryImpl implements ComponentRepository {
   final ComponentRepository localDataSource;
@@ -8,17 +7,20 @@ class ComponentRepositoryImpl implements ComponentRepository {
   ComponentRepositoryImpl(this.localDataSource);
 
   @override
-  Stream<Component?> watchTransactionData() {
+  Stream<ComponentModel?> watchTransactionData() {
     return localDataSource.watchTransactionData();
   }
 
   @override
-  Component? getTransactionData() {
+  ComponentModel? getTransactionData() {
+    print("getTransactionData");
+    print(localDataSource.getTransactionData());
     return localDataSource.getTransactionData();
   }
 
   @override
-  Future<void> updateTransactionData(Component transaction) {
+  Future<void> updateTransactionData(ComponentModel transaction) {
+    print("updateTransactionData : ");
     return localDataSource.updateTransactionData(transaction);
   }
 }

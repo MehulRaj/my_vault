@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_vault/features/savings/data/models/component_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants.dart';
-import '../../domain/entities/component.dart';
-import '../../domain/entities/savings.dart';
+import '../../data/models/savings_model.dart';
 import '../providers/component_provider.dart';
 
 class SavingsEntryScreen extends ConsumerStatefulWidget {
@@ -26,7 +26,7 @@ class SavingsEntryScreenState extends ConsumerState<SavingsEntryScreen> {
   @override
   Widget build(BuildContext context) {
     final notifier = ref.watch(transactionNotifierProvider.notifier);
-    var component = ref.watch(transactionStreamProvider).value;
+    var component = ref.watch(transactionFutureProvider).value;
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.enterSavings)),
       body: Padding(
@@ -74,35 +74,30 @@ class SavingsEntryScreenState extends ConsumerState<SavingsEntryScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  print("11111");
                   double saving = double.tryParse(savingsController.text) ?? 0;
                   var savingA = (_currentSliderValue * saving) / 100;
                   var savingB = ((100 - _currentSliderValue) * saving) / 100;
-                  print("22222");
-                  component ??= Component(
-                      totalA: 0.0,
-                      savings: [],
-                      withdraws: [],
-                      components: [],
-                      totalB: 0.0);
-                  print("3333 ${component}");
+                  component ??= ComponentModel(
+                      totalA: 0.0, savings: [], withdraws: [], totalB: 0.0);
+
                   var updatedData = component!.copyWith(
-                      totalA: component!.totalA + savingA,
-                      totalB: component!.totalB + savingB,
-                      savings: [
-                        ...component!.savings,
-                        Saving(
-                          saving: saving,
-                          date: DateTime.now(),
-                        )
-                      ],
-                      withdraws: component!.withdraws,
-                      components: component!.components);
-                  print("11111");
+                    totalA: component!.totalA + savingA,
+                    totalB: component!.totalB + savingB,
+                    savings: [
+                      ...component!.savings,
+                      SavingsModel(saving: saving, date: DateTime.now())
+                    ],
+                    withdraws: component!.withdraws,
+                  );
+
+
+                  if (!context.mounted) return;
                   await notifier.update(updatedData);
-                  Navigator.pop(context);
+
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
                 } catch (e) {
-                  print("ERROR ::: ${e.toString()}");
                 }
               },
               child: const Text(Constant.submit),

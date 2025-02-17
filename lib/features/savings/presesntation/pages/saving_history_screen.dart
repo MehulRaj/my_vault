@@ -21,106 +21,113 @@ class SavingsHistoryScreenState extends ConsumerState<SavingsHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final historyData = ref.watch(transactionStreamProvider);
+    final historyData = ref.watch(transactionFutureProvider);
     return Scaffold(
         appBar: AppBar(title: const Text(Constant.history)),
-        body: Column(children: [
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: InkWell(
-                      onTap: onTapSavings,
-                      child: Container(
-                          color: selectedTabIndex == 0
-                              ? Colors.blue
-                              : Colors.blue.withAlpha(50),
-                          child: Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Center(child: Text(Constant.savingsHistory)),
-                          )),
-                    )),
-                    Expanded(
-                        child: InkWell(
-                      onTap: onTapWithdraw,
-                      child: Container(
-                          color: selectedTabIndex == 1
-                              ? Colors.blue
-                              : Colors.blue.withAlpha(50),
-                          child: Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child:
-                                Center(child: Text(Constant.withdrawHistory)),
-                          )),
-                    )),
-                  ],
+        body: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: onTapSavings,
+                    child: Container(
+                        color: selectedTabIndex == 0
+                            ? Colors.blue
+                            : Colors.blue.withAlpha(50),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Center(child: Text(Constant.savingsHistory)),
+                        )),
+                  ),
                 ),
+                Expanded(
+                  child: InkWell(
+                    onTap: onTapWithdraw,
+                    child: Container(
+                        color: selectedTabIndex == 1
+                            ? Colors.blue
+                            : Colors.blue.withAlpha(50),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Center(child: Text(Constant.withdrawHistory)),
+                        )),
+                  ),
+                ),
+              ],
+            ),
+            historyData.when(
+              data: (data) {
+                if (data == null ||
+                    (data.savings.isEmpty && data.withdraws.isEmpty)) {
+                  return const Expanded(
+                    child: Center(child: Text(Constant.noHistoryAvailable)),
+                  );
+                }
+
+                if (selectedTabIndex == 0 && data.savings.isNotEmpty) {
+                  return Expanded(
+                    // 🔹 Add Expanded to avoid infinite height issue
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: data.savings.length,
+                      itemBuilder: (context, index) {
+                        final entry = data.savings[index];
+                        return Card(
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          child: ListTile(
+                            title: Text(
+                              "Year: ${entry.date?.year}, Savings: ${entry.saving}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+
+                if (selectedTabIndex == 1 && data.withdraws.isNotEmpty) {
+                  return Expanded(
+                    // 🔹 Add Expanded to avoid infinite height issue
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: data.withdraws.length,
+                      itemBuilder: (context, index) {
+                        final entry = data.withdraws[index];
+                        return Card(
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          child: ListTile(
+                            title: Text(
+                              "Year: ${entry.date?.year}, Withdraw: ${entry.amount}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+
+                return const SizedBox(); // Default empty widget
+              },
+              error: (err, stack) => Expanded(
+                child: Center(child: Text("Error: $err")),
               ),
-              historyData.when(
-                data: (data) {
-                  if (data!.components.isEmpty) {
-                    return Expanded(
-                        child:
-                            Center(child: Text(Constant.noHistoryAvailable)));
-                  }
-                  if (data.savings.isNotEmpty && selectedTabIndex == 0) {
-                    return Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(16.0),
-                        itemCount: data.savings.length,
-                        itemBuilder: (context, index) {
-                          final entry = data.savings.toList()[index];
-                          return Card(
-                            elevation: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            child: ListTile(
-                              title: Text(
-                                "Year: ${entry.date.year},Savings: ${entry.saving}",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  }
-                  if (data.withdraws.isNotEmpty && selectedTabIndex != 1) {
-                    return Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(16.0),
-                        itemCount: data.withdraws.length,
-                        itemBuilder: (context, index) {
-                          final entry = data.withdraws.toList()[index];
-                          return Card(
-                            elevation: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            child: ListTile(
-                              title: Text(
-                                "Year: ${entry.date.year},Withdraw: ${entry.amount}",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  }
-                  return SizedBox();
-                },
-                error: (err, stack) => Center(
-                  child: Text("Error: $err"),
-                ),
-                loading: () => Center(child: CircularProgressIndicator()),
-              )
-            ],
-          ),
-        ]));
+              loading: () => const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            )
+          ],
+        ));
   }
 
   void onTapSavings() {

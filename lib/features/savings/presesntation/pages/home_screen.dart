@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants.dart';
-import '../../core/helpers/local_storage_helper.dart';
 import '../providers/component_provider.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -23,8 +22,8 @@ class MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final component = ref.watch(transactionStreamProvider).value;
-    print("component : ${component}");
+    final component = ref.watch(transactionFutureProvider).value;
+    print("COMPONENT : ${component.toString()}");
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.myVault)),
       body: Padding(

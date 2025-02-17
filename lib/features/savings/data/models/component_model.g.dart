@@ -17,27 +17,26 @@ class ComponentModelAdapter extends TypeAdapter<ComponentModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ComponentModel(
-      totalA: fields[0] as double,
-      totalB: fields[1] as double,
-      components: (fields[2] as List).cast<Component>(),
-      savings: (fields[4] as List).cast<Saving>(),
-      withdraws: (fields[3] as List).cast<Withdraw>(),
+      totalA: fields[0] == null ? 0.0 : fields[0] as double,
+      totalB: fields[1] == null ? 0.0 : fields[1] as double,
+      savings:
+          fields[3] == null ? [] : (fields[3] as List).cast<SavingsModel>(),
+      withdraws:
+          fields[2] == null ? [] : (fields[2] as List).cast<WithdrawModel>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, ComponentModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.totalA)
       ..writeByte(1)
       ..write(obj.totalB)
       ..writeByte(2)
-      ..write(obj.components)
-      ..writeByte(3)
       ..write(obj.withdraws)
-      ..writeByte(4)
+      ..writeByte(3)
       ..write(obj.savings);
   }
 

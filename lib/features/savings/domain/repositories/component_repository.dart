@@ -1,9 +1,9 @@
-import 'package:my_vault/features/savings/domain/entities/component.dart';
+import '../../data/models/component_model.dart';
 
 abstract class ComponentRepository {
-  Stream<Component?> watchTransactionData();
+  Stream<ComponentModel?> watchTransactionData();
 
-  Component? getTransactionData();
+  ComponentModel? getTransactionData();
 
-  Future<void> updateTransactionData(Component transaction);
+  Future updateTransactionData(ComponentModel transaction);
 }

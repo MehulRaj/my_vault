@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_vault/features/savings/domain/entities/component.dart';
 import 'package:my_vault/features/savings/domain/repositories/component_repository.dart';
 import 'package:my_vault/features/savings/domain/usecases/update_component_data.dart';
-
+import '../../core/constants.dart';
+import '../../core/hive/hive_boxes.dart';
 import '../../data/datasources/component_local_datasource.dart';
+import '../../data/models/component_model.dart';
 import '../../data/respositories/component_repository_impl.dart';
+
 
 // Local Data Source Provider
 final transactionLocalDataSourceProvider =
@@ -20,9 +22,9 @@ final transactionRepositoryProvider = Provider<ComponentRepositoryImpl>((ref) {
 
 // Get Transaction Data Use Case Provider
 final getTransactionDataProvider = Provider<ComponentRepository>((ref) {
-  final repository = ref.watch(transactionRepositoryProvider);
-  return ComponentRepositoryImpl(repository);
+  return ref.watch(transactionRepositoryProvider);
 });
+
 
 // Update Transaction Data Use Case Provider
 final updateTransactionDataProvider = Provider<UpdateComponentData>((ref) {
@@ -31,28 +33,37 @@ final updateTransactionDataProvider = Provider<UpdateComponentData>((ref) {
 });
 
 // Transaction Data Stream Provider (Listenable)
-final transactionStreamProvider = StreamProvider<Component?>((ref) {
-  final getTransactionData = ref.watch(getTransactionDataProvider);
-  return getTransactionData.watchTransactionData();
+final transactionFutureProvider = FutureProvider<ComponentModel?>((ref) async {
+  final box = HiveBoxes.transactionDataBox;
+  final componentModel = box.get(Constant.component);
+
+  print("⚡ FutureProvider fetched: $componentModel");
+
+  return componentModel?.toEntity();
 });
+
+
 
 // Transaction Data Notifier Provider (For Updates)
 final transactionNotifierProvider =
-    StateNotifierProvider<ComponentNotifier, Component?>((ref) {
+StateNotifierProvider<ComponentNotifier, ComponentModel?>((ref) {
   final updateTransactionData = ref.watch(updateTransactionDataProvider);
-  final transaction = ref.watch(transactionStreamProvider).value;
-  return ComponentNotifier(updateTransactionData, transaction);
+  return ComponentNotifier(updateTransactionData);
 });
 
+
 // Notifier for Updating Transactions
-class ComponentNotifier extends StateNotifier<Component?> {
+class ComponentNotifier extends StateNotifier<ComponentModel?> {
   final UpdateComponentData _updateTransactionData;
 
-  ComponentNotifier(this._updateTransactionData, Component? transaction)
-      : super(transaction);
+  ComponentNotifier(this._updateTransactionData) : super(null);
 
-  Future<void> update(Component transaction) async {
-    await _updateTransactionData(transaction);
+  Future<void> update(ComponentModel transaction) async {
+    try {
+      await _updateTransactionData(transaction);
+    } catch (e) {
+    }
     state = transaction;
   }
 }
+

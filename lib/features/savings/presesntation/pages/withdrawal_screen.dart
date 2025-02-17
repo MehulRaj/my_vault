@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_vault/features/savings/domain/entities/withdraw.dart';
+import 'package:my_vault/features/savings/data/models/withdraw_model.dart';
 
 import '../../core/constants.dart';
-import '../../domain/entities/component.dart';
+import '../../data/models/component_model.dart';
 import '../providers/component_provider.dart';
 
 class WithdrawalScreen extends ConsumerStatefulWidget {
@@ -20,7 +20,7 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
   @override
   Widget build(BuildContext context) {
     final notifier = ref.watch(transactionNotifierProvider.notifier);
-    final component = ref.watch(transactionStreamProvider).value;
+    final component = ref.watch(transactionFutureProvider).value;
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.withdrawAmount)),
       body: Padding(
@@ -52,16 +52,16 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  double saving = double.tryParse(withdrawalController.text) ??
-                      0;
-                  Component updatedData = component?.copyWith(
+                  double saving =
+                      double.tryParse(withdrawalController.text) ?? 0;
+                  ComponentModel? updatedData = component?.copyWith(
                     totalA: component.totalA,
                     totalB: component.totalB,
-                    components: component.components,
+                    // components: component.components,
                     savings: component.savings,
                     withdraws: [
                       ...component.withdraws,
-                      Withdraw(
+                      WithdrawModel(
                         amount: saving,
                         component: selectedComponent,
                         date: DateTime.now(),
@@ -70,18 +70,15 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                   );
 
                   if (selectedComponent == Constant.components[0]) {
-                    updatedData =
-                        updatedData.copyWith(
-                            totalA: component!.totalA - saving);
+                    updatedData = updatedData?.copyWith(
+                        totalA: component!.totalA - saving);
                   } else {
-                    updatedData =
-                        updatedData.copyWith(
-                            totalB: component!.totalB - saving);
+                    updatedData = updatedData?.copyWith(
+                        totalB: component!.totalB - saving);
                   }
-                  notifier.update(updatedData);
-                }catch(e){
-                  print(e);
-                   SnackBar(content: Text("Error"));
+                  notifier.update(updatedData!);
+                } catch (e) {
+                  SnackBar(content: Text("Error"));
                 }
                 Navigator.pop(context);
               },

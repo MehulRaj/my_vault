@@ -1,34 +1,34 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'saving_model.dart';
+part of 'savings_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SavingModelAdapter extends TypeAdapter<SavingModel> {
+class SavingsModelAdapter extends TypeAdapter<SavingsModel> {
   @override
   final int typeId = 2;
 
   @override
-  SavingModel read(BinaryReader reader) {
+  SavingsModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SavingModel(
-      date: fields[2] as DateTime,
-      saving: fields[1] as double?,
+    return SavingsModel(
+      saving: fields[0] == null ? 0.0 : fields[0] as double,
+      date: fields[1] as DateTime?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, SavingModel obj) {
+  void write(BinaryWriter writer, SavingsModel obj) {
     writer
       ..writeByte(2)
-      ..writeByte(1)
+      ..writeByte(0)
       ..write(obj.saving)
-      ..writeByte(2)
+      ..writeByte(1)
       ..write(obj.date);
   }
 
@@ -38,7 +38,7 @@ class SavingModelAdapter extends TypeAdapter<SavingModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SavingModelAdapter &&
+      other is SavingsModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

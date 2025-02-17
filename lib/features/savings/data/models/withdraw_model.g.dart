@@ -17,9 +17,9 @@ class WithdrawModelAdapter extends TypeAdapter<WithdrawModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return WithdrawModel(
-      amount: fields[0] as double,
-      component: fields[1] as String,
-      date: fields[2] as DateTime,
+      amount: fields[0] == null ? 0.0 : fields[0] as double,
+      component: fields[1] == null ? '' : fields[1] as String,
+      date: fields[2] as DateTime?,
     );
   }
 

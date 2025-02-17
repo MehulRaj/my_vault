@@ -1,12 +1,13 @@
-import 'package:my_vault/features/savings/domain/entities/component.dart';
 import 'package:my_vault/features/savings/domain/repositories/component_repository.dart';
+
+import '../../data/models/component_model.dart';
 
 class UpdateComponentData {
   final ComponentRepository repository;
 
   UpdateComponentData(this.repository);
 
-  Future<void> call(Component transaction) {
-    return repository.updateTransactionData(transaction);
+  Future call(ComponentModel transaction) async {
+    return await repository.updateTransactionData(transaction);
   }
 }
