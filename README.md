@@ -28,6 +28,11 @@ lib/
 - **Views:** Houses all the UI screens, including `HomeScreen`, `SavingsEntryScreen`, and `SavingsHistoryScreen`.
 - **Providers:** Implements state management using Riverpod.
 
+"Riverpod + Hive Clean Architecture" 🚀
+✅ Clean Architecture-inspired (separates UI, domain, and data).
+✅ Riverpod for state management (decoupled from UI).
+✅ Hive as local storage (with data modeling and conversion).
+
 ## State Management Choice: **Riverpod**
 
 We use **Flutter Riverpod** for its simplicity, scalability, and reusability in managing application state. Key benefits:
