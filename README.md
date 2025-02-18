@@ -28,6 +28,8 @@ lib/
 - **Views:** Houses all the UI screens, including `HomeScreen`, `SavingsEntryScreen`, and `SavingsHistoryScreen`.
 - **Providers:** Implements state management using Riverpod.
 
+
+
 "Riverpod + Hive Clean Architecture" 🚀
 
 ✅ Clean Architecture-inspired (separates UI, domain, and data).
@@ -35,6 +37,8 @@ lib/
 ✅ Riverpod for state management (decoupled from UI).
 
 ✅ Hive as local storage (with data modeling and conversion).
+
+
 
 ## State Management Choice: **Riverpod**
 
