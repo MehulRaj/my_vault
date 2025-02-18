@@ -12,18 +12,9 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class MainScreenState extends ConsumerState<MainScreen> {
-  double? componentAValue;
-  double? componentBValue;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final component = ref.watch(transactionFutureProvider).value;
-    print("COMPONENT : ${component.toString()}");
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.myVault)),
       body: Padding(

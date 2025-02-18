@@ -19,8 +19,6 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = ref.watch(transactionNotifierProvider.notifier);
-    final component = ref.watch(transactionFutureProvider).value;
     return Scaffold(
       appBar: AppBar(title: const Text(Constant.withdrawAmount)),
       body: Padding(
@@ -50,43 +48,44 @@ class WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                try {
-                  double saving =
-                      double.tryParse(withdrawalController.text) ?? 0;
-                  ComponentModel? updatedData = component?.copyWith(
-                    totalA: component.totalA,
-                    totalB: component.totalB,
-                    // components: component.components,
-                    savings: component.savings,
-                    withdraws: [
-                      ...component.withdraws,
-                      WithdrawModel(
-                        amount: saving,
-                        component: selectedComponent,
-                        date: DateTime.now(),
-                      )
-                    ],
-                  );
-
-                  if (selectedComponent == Constant.components[0]) {
-                    updatedData = updatedData?.copyWith(
-                        totalA: component!.totalA - saving);
-                  } else {
-                    updatedData = updatedData?.copyWith(
-                        totalB: component!.totalB - saving);
-                  }
-                  notifier.update(updatedData!);
-                } catch (e) {
-                  SnackBar(content: Text("Error"));
-                }
-                Navigator.pop(context);
-              },
+              onPressed: handleWithdraw,
               child: const Text(Constant.withdraw),
             ),
           ],
         ),
       ),
     );
+  }
+
+  handleWithdraw() {
+    final notifier = ref.watch(transactionNotifierProvider.notifier);
+    var component = ref.watch(transactionFutureProvider).value;
+    try {
+      double saving = double.tryParse(withdrawalController.text) ?? 0;
+      ComponentModel? updatedData = component?.copyWith(
+        totalA: component.totalA,
+        totalB: component.totalB,
+        // components: component.components,
+        savings: component.savings,
+        withdraws: [
+          ...component.withdraws,
+          WithdrawModel(
+            amount: saving,
+            component: selectedComponent,
+            date: DateTime.now(),
+          )
+        ],
+      );
+
+      if (selectedComponent == Constant.components[0]) {
+        updatedData = updatedData?.copyWith(totalA: component!.totalA - saving);
+      } else {
+        updatedData = updatedData?.copyWith(totalB: component!.totalB - saving);
+      }
+      notifier.update(updatedData!);
+    } catch (e) {
+      SnackBar(content: Text("Error"));
+    }
+    Navigator.pop(context);
   }
 }

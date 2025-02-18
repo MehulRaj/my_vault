@@ -1,12 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_vault/features/savings/domain/repositories/component_repository.dart';
 import 'package:my_vault/features/savings/domain/usecases/update_component_data.dart';
 import '../../core/constants.dart';
 import '../../core/hive/hive_boxes.dart';
 import '../../data/datasources/component_local_datasource.dart';
 import '../../data/models/component_model.dart';
 import '../../data/respositories/component_repository_impl.dart';
-
 
 // Local Data Source Provider
 final transactionLocalDataSourceProvider =
@@ -19,12 +17,6 @@ final transactionRepositoryProvider = Provider<ComponentRepositoryImpl>((ref) {
   final localDataSource = ref.watch(transactionLocalDataSourceProvider);
   return ComponentRepositoryImpl(localDataSource);
 });
-
-// Get Transaction Data Use Case Provider
-final getTransactionDataProvider = Provider<ComponentRepository>((ref) {
-  return ref.watch(transactionRepositoryProvider);
-});
-
 
 // Update Transaction Data Use Case Provider
 final updateTransactionDataProvider = Provider<UpdateComponentData>((ref) {
@@ -42,15 +34,12 @@ final transactionFutureProvider = FutureProvider<ComponentModel?>((ref) async {
   return componentModel?.toEntity();
 });
 
-
-
 // Transaction Data Notifier Provider (For Updates)
 final transactionNotifierProvider =
-StateNotifierProvider<ComponentNotifier, ComponentModel?>((ref) {
+    StateNotifierProvider<ComponentNotifier, ComponentModel?>((ref) {
   final updateTransactionData = ref.watch(updateTransactionDataProvider);
   return ComponentNotifier(updateTransactionData);
 });
-
 
 // Notifier for Updating Transactions
 class ComponentNotifier extends StateNotifier<ComponentModel?> {
@@ -61,9 +50,7 @@ class ComponentNotifier extends StateNotifier<ComponentModel?> {
   Future<void> update(ComponentModel transaction) async {
     try {
       await _updateTransactionData(transaction);
-    } catch (e) {
-    }
+    } catch (e) {}
     state = transaction;
   }
 }
-

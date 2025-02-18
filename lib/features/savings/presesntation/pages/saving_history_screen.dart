@@ -11,7 +11,7 @@ class SavingsHistoryScreen extends ConsumerStatefulWidget {
   SavingsHistoryScreenState createState() => SavingsHistoryScreenState();
 }
 
-class SavingsHistoryScreenState extends ConsumerState<SavingsHistoryScreen> {
+class SavingsHistoryScreenState e xtends ConsumerState<SavingsHistoryScreen> {
   int selectedTabIndex = 0;
 
   @override
@@ -93,7 +93,6 @@ class SavingsHistoryScreenState extends ConsumerState<SavingsHistoryScreen> {
 
                 if (selectedTabIndex == 1 && data.withdraws.isNotEmpty) {
                   return Expanded(
-                    // 🔹 Add Expanded to avoid infinite height issue
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16.0),
                       itemCount: data.withdraws.length,
@@ -116,7 +115,6 @@ class SavingsHistoryScreenState extends ConsumerState<SavingsHistoryScreen> {
                     ),
                   );
                 }
-
                 return const SizedBox(); // Default empty widget
               },
               error: (err, stack) => Expanded(
